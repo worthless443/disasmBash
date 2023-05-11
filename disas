@@ -1,0 +1,23 @@
+# A simple bash script wrapper around `objdump` to show disassembly of a specific symbol
+
+#!/bin/bash
+[ ! -f $3 ] && echo "disas:\"$3\" doesn't exist" && exit
+if ! readelf -S $3 2>/dev/null 1>/dev/null; then "disas:\"$3\" invalid file or format";exit;fi 
+if [ "$1" != "d" ]; then echo give option "help -> \"d\"" && [ -z $3 ] && echo give filename
+else
+echo -e "\033[3;37m" disassembing "\033[1;32m\"$2\"\033[00m" from "\033[1;33m"$3 "\033[00m"
+
+addressSize=16
+
+ranges=$(objdump -D $3 | awk  "{if(length(\$1) == $addressSize && \$2 == \"<$2>:\") main=NR; if(length(\$1) == $addressSize) { printf \"%s:\", NR;};if(NR==main) printf \"\n%s\n\", main;}" | awk 'BEGIN{RS="\n";ORS="|"}{print}' | awk '{split($1,list2d,"|");split(list2d[1],list_a,":");split(list2d[3],list_b,":"); print list_a[length(list_a)-1] ":" list_b[1]}')
+
+srt=$(awk -F":" '{print $1}' <<< $ranges)
+end=$(awk -F":" '{print $2}' <<< $ranges)
+
+[ -e $end ] && echo "disas: symbol \"$2\" not found" && exit
+
+if [ -z $srt ] && [ -z $end ]; then echo wrong happened  && exit;fi 
+echo -e "\033[1;32m"
+objdump -D $3 | awk "NR>$srt&& NR<$end{print}"
+echo -e "\033[00m"
+fi
