@@ -13,7 +13,7 @@ or
 
 ```bash
 ./disas d _start ./a.out
-`
+```
 for symbol main, shows output like this:
 
 ```bash
