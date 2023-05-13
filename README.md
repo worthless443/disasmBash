@@ -49,3 +49,6 @@ disassembing "main" from /a.out
 
 Disassembly of section .fini:
 ```
+
+## TODO 
+Add color options for disassembly 
